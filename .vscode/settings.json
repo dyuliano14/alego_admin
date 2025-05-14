@@ -1,0 +1,7 @@
+{
+    "python.testing.autoTestDiscoverOnSaveEnabled": false,
+    "python.analysis.importFormat": "absolute",
+    "python.analysis.indexing": true,
+    "python.sortImports.onSave": false,
+    "editor.codeActionsOnSave": {}
+}

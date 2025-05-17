@@ -34,3 +34,29 @@ def upload_html(nome):
 
     flash(f'{filename} enviado com sucesso!')
     return redirect(url_for('main.editar_disciplina', nome=nome))
+
+import csv
+import json
+
+@main.route('/disciplinas/<nome>/upload_flashcards', methods=['POST'])
+def upload_flashcards(nome):
+    file = request.files.get('file')
+    if not file or not file.filename.endswith('.csv'):
+        flash("Envie um arquivo .CSV válido.")
+        return redirect(url_for('main.editar_disciplina', nome=nome))
+
+    disciplina_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], nome)
+    os.makedirs(disciplina_dir, exist_ok=True)
+
+    # Lê e converte o CSV
+    csv_reader = csv.DictReader(file.stream.read().decode('utf-8').splitlines())
+    flashcards = list(csv_reader)
+
+    # Salva como JSON
+    json_path = os.path.join(disciplina_dir, 'flashcards.json')
+    with open(json_path, 'w', encoding='utf-8') as f:
+        json.dump(flashcards, f, ensure_ascii=False, indent=2)
+
+    flash("Flashcards enviados com sucesso!")
+    return redirect(url_for('main.editar_disciplina', nome=nome))
+

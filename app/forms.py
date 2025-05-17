@@ -1,8 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 
-class LoginForm(FlaskForm):
-    username = StringField('Usuário', validators=[DataRequired()])
-    password = PasswordField('Senha', validators=[DataRequired()])
-    submit = SubmitField('Entrar')
+class DisciplinaForm(FlaskForm):
+    nome_disciplina = StringField('Nome da Disciplina', validators=[DataRequired()])
+    submit = SubmitField('Criar')

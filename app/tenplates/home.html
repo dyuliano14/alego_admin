@@ -7,3 +7,18 @@
   <!-- Adicione outras disciplinas aqui -->
 </ul>
 {% endblock %}
+
+{% extends 'base.html' %}
+{% block content %}
+<h2>Disciplinas</h2>
+<ul>
+  {% for nome in disciplinas %}
+  <li>
+    <a href="{{ url_for('main.editar_disciplina', nome=nome) }}">
+      {{ nome }}
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+<a href="{{ url_for('main.nova_disciplina') }}">➕ Incluir Nova Disciplina</a>
+{% endblock %}

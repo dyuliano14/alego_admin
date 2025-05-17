@@ -1,21 +1,36 @@
-from flask import render_template, redirect, url_for, flash
-from . import db
-from .forms import LoginForm
-from flask import current_app as app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+import os
+from werkzeug.utils import secure_filename
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+main = Blueprint('main', __name__)
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        # Lógica de autenticação aqui
-        flash('Login realizado com sucesso!', 'success')
-        return redirect(url_for('dashboard'))
-    return render_template('login.html', form=form)
+@main.route('/')
+def home():
+    return render_template('home.html')
 
-@app.route('/dashboard')
-def dashboard():
-    return render_template('dashboard.html')
+@main.route('/disciplinas/<nome>/editar')
+def editar_disciplina(nome):
+    return render_template('editar_disciplina.html', nome=nome)
+
+@main.route('/disciplinas/<nome>/upload', methods=['POST'])
+def upload_html(nome):
+    if 'arquivo' not in request.files:
+        flash('Arquivo não encontrado.')
+        return redirect(url_for('main.editar_disciplina', nome=nome))
+
+    arquivo = request.files['arquivo']
+    if arquivo.filename == '':
+        flash('Nome de arquivo vazio.')
+        return redirect(url_for('main.editar_disciplina', nome=nome))
+
+    if not arquivo.filename.endswith('.html'):
+        flash('Somente arquivos .html são aceitos.')
+        return redirect(url_for('main.editar_disciplina', nome=nome))
+
+    filename = secure_filename(arquivo.filename)
+    caminho = os.path.join(current_app.config['UPLOAD_FOLDER'], nome, filename)
+    os.makedirs(os.path.dirname(caminho), exist_ok=True)
+    arquivo.save(caminho)
+
+    flash(f'{filename} enviado com sucesso!')
+    return redirect(url_for('main.editar_disciplina', nome=nome))

@@ -6,7 +6,14 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-  <header><h1>🛠️ ALEGO Painel Administrativo</h1></header>
+  <header>
+    <h1>🛠️ ALEGO Painel Administrativo</h1>
+    <nav>
+          <a href="{{ url_for('main.index') }}">Início</a> |
+          <a href="{{ url_for('main.login') }}">Login</a> |
+          <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+      </nav>
+  </header>
   <main>{% with messages = get_flashed_messages() %}
     {% if messages %}
       <ul>{% for msg in messages %}<li>{{ msg }}</li>{% endfor %}</ul>

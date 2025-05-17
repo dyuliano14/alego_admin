@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p>Selecione uma disciplina para editar:</p>
+<ul>
+  <li><a href="{{ url_for('main.editar_disciplina', nome='regimento') }}">Regimento</a></li>
+  <!-- Adicione outras disciplinas aqui -->
+</ul>
+{% endblock %}

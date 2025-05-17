@@ -60,3 +60,9 @@ def upload_flashcards(nome):
     flash("Flashcards enviados com sucesso!")
     return redirect(url_for('main.editar_disciplina', nome=nome))
 
+@main.route('/')
+def index():
+    disciplinas = os.listdir(current_app.config['UPLOAD_FOLDER'])
+    return render_template('home.html', disciplinas=disciplinas)
+
+

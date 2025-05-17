@@ -8,4 +8,11 @@
   <input type="file" name="arquivo" accept=".html" required><br><br>
   <button type="submit">Upload</button>
 </form>
+<h3>Upload de Flashcards (CSV)</h3>
+<form method="post" enctype="multipart/form-data"
+      action="{{ url_for('main.upload_flashcards', nome=nome) }}">
+  <input type="file" name="file" accept=".csv" required>
+  <button type="submit">Enviar CSV</button>
+</form>
+
 {% endblock %}

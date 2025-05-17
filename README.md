@@ -1,6 +1,14 @@
 # projeto-site-flask
 
-Estudo de criação de site usanto flask/python
+Projeto: Painel Administrativo ALEGO Admin
+Descrição: Interface web para criar e alimentar disciplinas para o site estático "AlegoMain".
+Tecnologias: Flask, HTML, CSS, Contentful API
+
+Execução local:
+1. python -m venv venv
+2. source venv/bin/activate (ou venv\Scripts\activate no Windows)
+3. pip install -r requirements.txt
+4. python run.py
 
 
 acesse:

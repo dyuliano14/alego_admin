@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Painel Admin{% endblock %}
+{% block content %}
+<h2>Bem-vindo, {{ current_user.username }}</h2>
+<p>Você está logado!</p>
+<a href="{{ url_for('main.nova_disciplina') }}">➕ Nova Disciplina</a>
+{% endblock %}

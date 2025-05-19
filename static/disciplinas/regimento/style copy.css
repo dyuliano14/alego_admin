@@ -1,0 +1,196 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header,
+footer {
+    background-color: #003366;
+    color: #fff;
+    text-align: center;
+    padding: 1em 0;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2em;
+}
+
+#flashcard-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#flashcard {
+    width: 300px;
+    height: 200px;
+    perspective: 1000px;
+    margin-bottom: 1em;
+    cursor: pointer;
+    position: relative;
+}
+
+.face {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    backface-visibility: hidden;
+    background-color: #fff;
+    border: 2px solid #003366;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1em;
+    box-sizing: border-box;
+    transition: transform 0.6s;
+}
+
+.frente {
+    transform: rotateY(0deg);
+}
+
+.verso {
+    transform: rotateY(180deg);
+}
+
+#flashcard.flipped .frente {
+    transform: rotateY(-180deg);
+}
+
+#flashcard.flipped .verso {
+    transform: rotateY(0deg);
+}
+
+#controles {
+    display: flex;
+    gap: 1em;
+}
+
+#controles button {
+    padding: 0.5em 1em;
+    font-size: 1em;
+    background-color: #003366;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#controles button:hover {
+    background-color: #0055aa;
+}
+
+@media (max-width: 600px) {
+    #flashcard {
+        width: 90%;
+        height: 150px;
+    }
+
+    #controles {
+        flex-direction: column;
+        gap: 0.5em;
+    }
+}
+
+.planejamento {
+    background: #fdfdfd;
+    border: 1px solid #ddd;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    border-radius: 8px;
+    max-width: 600px;
+    margin-inline: auto;
+}
+
+.planejamento h2 {
+    text-align: center;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+}
+
+.tarefa-lista {
+    list-style: none;
+    padding-left: 0;
+}
+
+.tarefa-lista li {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+}
+
+progress {
+    width: 100%;
+    height: 20px;
+    margin-bottom: 1rem;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.mapa {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.caixa {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    width: 360px;
+    background-color: #ccccb7;
+}
+
+.aula {
+    padding: 10px 20px;
+    background-color: #ff9800;
+    color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 0px 0px 10px 0px
+}
+
+.info {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    /*width: 300px;*/
+    background-color: #f9f9f9;
+}
+
+.info h3 {
+    margin-top: 0;
+}
+
+.caixa h2 {
+    text-align: center;
+}
+
+.bt_resumo {
+    padding: 10px 20px;
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.bt_apresentacoes {
+    padding: 10px 20px;
+    background-color: #08c828d1;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}

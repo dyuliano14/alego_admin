@@ -1,0 +1,267 @@
+:root {
+    --cor-fundo-modulo: #fdfdfd;
+    --cor-borda: #ddd;
+    --cor-botao-aula: #ff9800;
+    --cor-botao-aula-hover: #ff9900e3;
+    --cor-botao-resumo: #9f21f3;
+    --cor-botao-resumo-hover: #9f21f3d2;
+    --cor-botao-apresentacoes: #08c828d1;
+    --cor-botao-apresentacoes-hover: #08c828c2;
+    --cor-botao-flashcard: #0043fa;
+    --cor-botao-flashcard-hover: #5695f3;
+    --cor-texto: #333;
+    --padding-modulo: 1.5rem;
+    --max-width-modulo: 600px;
+}
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilo base para blocos de módulo */
+.modulo {
+    background: var(--cor-fundo-modulo);
+    border: 1px solid var(--cor-borda);
+    padding: var(--padding-modulo);
+    margin-top: 2rem;
+    border-radius: 8px;
+    max-width: var(--max-width-modulo);
+    margin-inline: auto;
+    
+}
+
+.modulo h2 {
+    text-align: center;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: var(--cor-texto);
+}
+
+/* Botões reutilizáveis */
+.botao {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.bt_aula {
+    background-color: var(--cor-botao-aula);
+}
+
+.bt_aula:hover {
+    background-color: var(--cor-botao-aula-hover);
+}
+
+.bt_resumo {
+    background-color: var(--cor-botao-resumo);
+}
+
+.bt_resumo:hover {
+    background-color: var(--cor-botao-resumo-hover);
+}
+
+.bt_apresentacoes {
+    background-color: var(--cor-botao-apresentacoes);
+}
+
+.bt_apresentacoes:hover {
+    background-color: var(--cor-botao-apresentacoes-hover);
+}
+
+.bt_flashcard {
+    background-color: var(--cor-botao-flashcard);
+}
+
+.bt_flashcard:hover {
+    background-color: var(--cor-botao-flashcard-hover);
+}
+
+/* Aulas renderizadas via Contentful */
+.aula-bloco {
+    background: #fff;
+    border: 1px solid var(--cor-borda);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.aula_pdf h3,
+.aula_pdf h4 {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+/* Planejamento */
+.planejamento h3,
+.planejamento h4 {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.resumos-bloco {
+    background: #fff;
+    border: 1px solid var(--cor-borda);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.resumos h3,
+.resumos h4 {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.apresentacoes-bloco {
+    background: #fff;
+    border: 1px solid var(--cor-borda);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.apresentacoes h3,
+.apresentacoes h4 {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+
+.apresentacoes {
+    margin-bottom: 120px;
+}
+
+ul {
+    list-style-type: none;
+    
+}
+
+li {
+    list-style-type: none;
+}
+
+
+/* Flashcards */
+#flashcard-container {
+    max-width: 600px;
+    margin-top: 2rem;
+    margin-inline: auto;
+    padding: 1.5rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#flashcard {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    margin-bottom: 20px;
+    perspective: 1000px;
+}
+
+.face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    background-color: #fff;
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    padding: 20px;
+    transition: transform 0.6s;
+}
+
+.frente {
+    z-index: 2;
+}
+
+.verso {
+    transform: rotateY(180deg);
+}
+
+#controles {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#controles button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    background-color: #0080ff;
+}
+
+
+/* Responsividade */
+@media (max-width: 600px) {
+    #flashcard-container {
+        padding: 10px;
+    }
+
+    #flashcard {
+        height: 150px;
+    }
+
+    .face {
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    #controles {
+        flex-direction: column;
+    }
+
+    #controles button {
+        width: 100%;
+    }
+}
+
+/* Progresso */
+#progresso {
+    width: 300px;
+    height: 25px;
+    appearance: none;
+}
+
+#progresso::-webkit-progress-bar {
+    background-color: #eee;
+    border-radius: 8px;
+}
+
+#progresso::-webkit-progress-value {
+    background-image: linear-gradient(to right, #0d6efd, #0dcaf0);
+    border-radius: 8px;
+}
+
+#percentual {
+    font-weight: bold;
+    min-width: 50px;
+    color: #0d6efd;
+}

@@ -1,0 +1,23 @@
+<section id="flashcard-container" class="modulo">
+    <h2>🎯Flashcards - Regimento Interno📝</h2>
+    <div id="flashcard" tabindex="0" aria-label="Flashcard atual">
+        <div id="pergunta" class="face frente">Pergunta</div>
+        <div id="resposta" class="face verso">Resposta</div>
+    </div>
+
+    <div class="botoes-flashcard">
+        <button id="anterior" class="botao bt_flashcard">⏮️ Anterior</button>
+        <button id="embaralhar" class="botao bt_flashcard">🔀 Embaralhar</button>
+        <button id="proximo" class="botao bt_flashcard">⏭️ Próximo</button>
+
+    </div>
+</section>
+<script>
+    fetch('./flashcards.json')
+        .then(res => res.json())
+        .then(data => {
+            console.log('Flashcards carregados:', data);
+            // Aqui você pode montar os flashcards dinamicamente
+        })
+        .catch(err => console.error('Erro ao carregar flashcards:', err));
+</script>

@@ -1,7 +1,9 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, jsonify
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_login import login_user, logout_user, login_required, current_user
-from .models import User
-from .forms import LoginForm, RecuperarSenhaForm, RedefinirSenhaForm  # <- esses dois novos
+from .models import User, Disciplina
+from werkzeug.security import check_password_hash
+from .forms import LoginForm, RegisterForm, RequestResetForm, ResetPasswordForm   
 from .forms import RegisterForm
 from werkzeug.security import generate_password_hash
 from . import db
@@ -12,26 +14,31 @@ import csv
 import json
 
 main = Blueprint('main', __name__)
+mail = Mail()
 
 @main.route('/')
 def home():
     return redirect(url_for('main.login'))
 
-@main.route('/login', methods=['GET', 'POST'])
+@main.route('/protected', methods=['GET'])
+@jwt_required()
+def protected():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    return jsonify({'id': user.id, 'username': user.username}), 200
+
+@main.route('/login', methods=['POST'])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))
+    data = request.get_json()
+    if not data or not data.get('username') or not data.get('password'):
+        return jsonify({'msg': 'Nome de usuário e senha são obrigatórios'}), 400
 
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user and user.password == form.password.data:
-            login_user(user)
-            return redirect(url_for('main.dashboard'))
-        else:
-            flash('Credenciais inválidas', 'danger')
+    user = User.query.filter_by(username=data['username']).first()
+    if not user or not check_password_hash(user.password, data['password']):
+        return jsonify({'msg': 'Credenciais inválidas'}), 401
 
-    return render_template('admin/login.html', form=form)
+    access_token = create_access_token(identity=user.id)
+    return jsonify(access_token=access_token), 200
 
 @main.route('/logout')
 @login_required
@@ -91,6 +98,32 @@ def upload_flashcards(nome):
     flash("Flashcards enviados com sucesso!")
     return redirect(url_for('main.dashboard'))
 
+@main.route('/disciplinas')
+@login_required  # se quiser exigir login
+def listar_disciplinas():
+    disciplinas = Disciplina.query.order_by(Disciplina.ordem).all()
+    return render_template('admin/listar_disciplinas.html', disciplinas=disciplinas)
+
+@main.route('/disciplinas/<int:id>/editar', methods=['GET', 'POST'])
+@login_required
+def editar_disciplina(id):
+    disciplina = Disciplina.query.get_or_404(id)
+
+    if request.method == 'POST':
+        disciplina.titulo = request.form['titulo']
+        disciplina.categoria = request.form['categoria']
+        disciplina.tipo = request.form['tipo']
+        disciplina.ordem = request.form['ordem']
+        disciplina.descricao = request.form['descricao']
+        disciplina.link = request.form['link']
+        
+        db.session.commit()
+        flash('Disciplina atualizada com sucesso!', 'success')
+        return redirect(url_for('main.listar_disciplinas'))
+
+    return render_template('admin/editar_disciplina.html', disciplina=disciplina)
+
+
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -109,8 +142,6 @@ def register():
         flash('Usuário registrado com sucesso!', 'success')
         return redirect(url_for('main.login'))
     return render_template('admin/register.html', form=form)
-
-mail = Mail()
 
 @main.route('/recuperar', methods=['GET', 'POST'])
 def recuperar():
@@ -146,3 +177,17 @@ def redefinir(token):
         return redirect(url_for('main.login'))
 
     return render_template('admin/redefinir.html', form=form)
+
+@main.route('/api/disciplinas')
+def api_listar_disciplinas():
+    disciplinas = Disciplina.query.order_by(Disciplina.ordem).all()
+    return jsonify([{'id': d.id, 'titulo': d.titulo, 'ordem': d.ordem} for d in disciplinas])
+
+
+
+
+
+
+
+
+

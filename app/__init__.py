@@ -4,40 +4,41 @@ from flask_login import LoginManager
 from flask_wtf import CSRFProtect
 from flask_mail import Mail
 from config import Config
+from flask_jwt_extended import JWTManager
 
 db = SQLAlchemy()
 csrf = CSRFProtect()
 mail = Mail()
 login_manager = LoginManager()
 login_manager.login_view = 'main.login'
-
+jwt = JWTManager()
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    app.config['JWT_SECRET_KEY'] = 'dyu1412'  
 
     db.init_app(app)
     csrf.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
+    jwt.init_app(app)
+    
+    from .models import User
 
-    from .models import User  # ✅ agora sim
-
-    # 👇 user_loader DEPOIS do modelo estar disponível
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
+    # 🔥 Estas linhas estavam mal indentadas!
     from .routes import main
     app.register_blueprint(main)
 
     with app.app_context():
         db.create_all()
 
+    from .api import api
+    app.register_blueprint(api)
+    csrf.exempt(api)  # <- ISSO AQUI!
+
     return app
-
-
-
-
-
-

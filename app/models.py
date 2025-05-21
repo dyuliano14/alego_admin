@@ -6,3 +6,12 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
+    
+class Disciplina(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    categoria = db.Column(db.String(50))
+    tipo = db.Column(db.String(50))
+    ordem = db.Column(db.Integer)
+    descricao = db.Column(db.Text)
+    link = db.Column(db.String(255))

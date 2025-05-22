@@ -1,14 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, jsonify
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_login import login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 from .models import User, Disciplina
-from werkzeug.security import check_password_hash
-from .forms import LoginForm, RegisterForm, RequestResetForm, ResetPasswordForm   
-from .forms import RegisterForm
-from werkzeug.security import generate_password_hash
-from . import db
+from .forms import LoginForm, RegisterForm, RequestResetForm, ResetPasswordForm
 from flask_mail import Message, Mail
 from .utils import gerar_token, verificar_token
+from . import db
 import os
 import csv
 import json
@@ -20,25 +17,16 @@ mail = Mail()
 def home():
     return redirect(url_for('main.login'))
 
-@main.route('/protected', methods=['GET'])
-@jwt_required()
-def protected():
-    current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
-    return jsonify({'id': user.id, 'username': user.username}), 200
-
-@main.route('/login', methods=['POST'])
+@main.route('/login', methods=['GET', 'POST'])
 def login():
-    data = request.get_json()
-    if not data or not data.get('username') or not data.get('password'):
-        return jsonify({'msg': 'Nome de usuário e senha são obrigatórios'}), 400
-
-    user = User.query.filter_by(username=data['username']).first()
-    if not user or not check_password_hash(user.password, data['password']):
-        return jsonify({'msg': 'Credenciais inválidas'}), 401
-
-    access_token = create_access_token(identity=user.id)
-    return jsonify(access_token=access_token), 200
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and check_password_hash(user.password, form.password.data):
+            login_user(user)
+            return redirect(url_for('main.dashboard'))
+        flash('Login inválido', 'danger')
+    return render_template('admin/login.html', form=form)
 
 @main.route('/logout')
 @login_required
@@ -99,7 +87,7 @@ def upload_flashcards(nome):
     return redirect(url_for('main.dashboard'))
 
 @main.route('/disciplinas')
-@login_required  # se quiser exigir login
+@login_required
 def listar_disciplinas():
     disciplinas = Disciplina.query.order_by(Disciplina.ordem).all()
     return render_template('admin/listar_disciplinas.html', disciplinas=disciplinas)
@@ -116,13 +104,12 @@ def editar_disciplina(id):
         disciplina.ordem = request.form['ordem']
         disciplina.descricao = request.form['descricao']
         disciplina.link = request.form['link']
-        
+
         db.session.commit()
         flash('Disciplina atualizada com sucesso!', 'success')
         return redirect(url_for('main.listar_disciplinas'))
 
     return render_template('admin/editar_disciplina.html', disciplina=disciplina)
-
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
@@ -135,12 +122,14 @@ def register():
 
         new_user = User(
             username=form.username.data,
+            email=form.email.data,
             password=generate_password_hash(form.password.data)
         )
         db.session.add(new_user)
         db.session.commit()
         flash('Usuário registrado com sucesso!', 'success')
         return redirect(url_for('main.login'))
+
     return render_template('admin/register.html', form=form)
 
 @main.route('/recuperar', methods=['GET', 'POST'])
@@ -156,10 +145,11 @@ def recuperar():
                           recipients=[user.email])
             msg.body = f'Acesse este link para redefinir sua senha: {link}'
             mail.send(msg)
+
         flash('Se o e-mail estiver registrado, enviaremos um link.', 'info')
         return redirect(url_for('main.login'))
-    return render_template('admin/recuperar.html', form=form)
 
+    return render_template('admin/recuperar.html', form=form)
 
 @main.route('/redefinir/<token>', methods=['GET', 'POST'])
 def redefinir(token):
@@ -177,17 +167,3 @@ def redefinir(token):
         return redirect(url_for('main.login'))
 
     return render_template('admin/redefinir.html', form=form)
-
-@main.route('/api/disciplinas')
-def api_listar_disciplinas():
-    disciplinas = Disciplina.query.order_by(Disciplina.ordem).all()
-    return jsonify([{'id': d.id, 'titulo': d.titulo, 'ordem': d.ordem} for d in disciplinas])
-
-
-
-
-
-
-
-
-

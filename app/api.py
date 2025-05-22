@@ -1,33 +1,50 @@
-from flask import Blueprint, jsonify, request, abort
-from .models import Disciplina
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from werkzeug.security import check_password_hash
+from .models import Disciplina, User
 from . import db
-from flask import current_app
 
 api = Blueprint('api', __name__)
 
-# ❌ DESATIVA CSRF para todas as rotas da API
 @api.before_request
 def skip_csrf_for_api():
     if request.path.startswith('/api/') and request.method in ['POST', 'PUT', 'DELETE']:
         setattr(request, '_dont_enforce_csrf', True)
 
+@api.route('/api/login', methods=['POST'])
+def api_login():
+    data = request.get_json()
+    if not data or not data.get('username') or not data.get('password'):
+        return jsonify({'msg': 'Dados incompletos'}), 400
+
+    user = User.query.filter_by(username=data['username']).first()
+    if not user or not check_password_hash(user.password, data['password']):
+        return jsonify({'msg': 'Credenciais inválidas'}), 401
+
+    token = create_access_token(identity=user.id)
+    return jsonify({'access_token': token}), 200
+
+@api.route('/api/protected', methods=['GET'])
+@jwt_required()
+def protected():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    return jsonify({'id': user.id, 'username': user.username}), 200
 
 @api.route('/api/disciplinas', methods=['GET'])
 def get_disciplinas():
-    disciplinas = Disciplina.query.all()
+    disciplinas = Disciplina.query.order_by(Disciplina.ordem).all()
     return jsonify([
-    {
-        'id': d.id,
-        'titulo': d.titulo,
-        'categoria': d.categoria,
-        'tipo': d.tipo,
-        'ordem': d.ordem,
-        'descricao': d.descricao,
-        'link': d.link
-    } for d in disciplinas
-])
-
-
+        {
+            'id': d.id,
+            'titulo': d.titulo,
+            'categoria': d.categoria,
+            'tipo': d.tipo,
+            'ordem': d.ordem,
+            'descricao': d.descricao,
+            'link': d.link
+        } for d in disciplinas
+    ])
 
 @api.route('/api/disciplinas/<int:id>', methods=['GET'])
 def get_disciplina(id):
@@ -42,8 +59,8 @@ def get_disciplina(id):
         'link': d.link
     })
 
-
 @api.route('/api/disciplinas', methods=['POST'])
+@jwt_required()
 def criar_disciplina():
     data = request.get_json()
     nova = Disciplina(
@@ -58,8 +75,8 @@ def criar_disciplina():
     db.session.commit()
     return jsonify({'message': 'Disciplina criada com sucesso!'}), 201
 
-
 @api.route('/api/disciplinas/<int:id>', methods=['PUT'])
+@jwt_required()
 def atualizar_disciplina(id):
     d = Disciplina.query.get_or_404(id)
     data = request.get_json()
@@ -72,8 +89,8 @@ def atualizar_disciplina(id):
     db.session.commit()
     return jsonify({'message': 'Disciplina atualizada com sucesso!'})
 
-
 @api.route('/api/disciplinas/<int:id>', methods=['DELETE'])
+@jwt_required()
 def deletar_disciplina(id):
     d = Disciplina.query.get_or_404(id)
     db.session.delete(d)

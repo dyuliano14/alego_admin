@@ -13,24 +13,25 @@ login_manager = LoginManager()
 login_manager.login_view = 'main.login'
 jwt = JWTManager()
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    app.config['JWT_SECRET_KEY'] = 'dyu1412'  
+    app.config['JWT_SECRET_KEY'] = 'dyu1412'
 
     db.init_app(app)
     csrf.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
     jwt.init_app(app)
-    
+
     from .models import User
 
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    # 🔥 Estas linhas estavam mal indentadas!
+    # 🔥 Estas linhas estavam mal indentadas
     from .routes import main
     app.register_blueprint(main)
 
@@ -39,6 +40,6 @@ def create_app():
 
     from .api import api
     app.register_blueprint(api)
-    csrf.exempt(api)  # <- ISSO AQUI!
+    csrf.exempt(api)
 
     return app

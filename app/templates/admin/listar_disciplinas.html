@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>📚 Disciplinas</h2>
+<ul>
+  {% for nome in disciplinas %}
+    <ul>
+  {% for d in disciplinas %}
+    <li>{{ d.titulo }}</li>  {# NÃO use d.nome se o campo é d.titulo! #}
+  {% endfor %}
+</ul>
+
+
+<a href="{{ url_for('main.nova_disciplina') }}">➕ Nova Disciplina</a>
+{% endblock %}

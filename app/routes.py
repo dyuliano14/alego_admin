@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import User, Disciplina
-from .forms import LoginForm, RegisterForm, RequestResetForm, ResetPasswordForm
+from .forms import LoginForm, RegisterForm, RequestResetForm, ResetPasswordForm, NovaDisciplinaForm
 from flask_mail import Message, Mail
 from .utils import gerar_token, verificar_token
 from . import db
@@ -42,28 +42,20 @@ def dashboard():
 @main.route('/nova_disciplina', methods=['GET', 'POST'])
 @login_required
 def nova_disciplina():
-    if request.method == 'POST':
-        nome = request.form.get('nome_disciplina').strip().lower()
-        path = os.path.join(current_app.config['UPLOAD_FOLDER'], nome)
-        os.makedirs(path, exist_ok=True)
+    form = NovaDisciplinaForm()
+    if form.validate_on_submit():
+        titulo = form.nome_disciplina.data.strip().lower()
 
-        modelos = {
-            'index.html': '<h2>{{ nome }}</h2><p>Bem-vindo!</p>',
-            'aulas.html': '<section class="aula_pdf"><h2>Aulas</h2></section>',
-            'planejamento.html': '<section class="planejamento"><h2>Planejamento</h2></section>',
-            'resumos.html': '<section class="resumos"><h2>Resumos</h2></section>',
-            'flashcards.html': '<section id="flashcard-container"><h2>Flashcards</h2></section>',
-            'apresentacoes.html': '<section class="apresentacoes"><h2>Apresentações</h2></section>'
-        }
+        nova = Disciplina(titulo=titulo, categoria="", tipo="", ordem=0, descricao="", link="")
+        db.session.add(nova)
+        db.session.commit()
 
-        for nome_arquivo, conteudo in modelos.items():
-            with open(os.path.join(path, nome_arquivo), 'w', encoding='utf-8') as f:
-                f.write(conteudo.replace('{{ nome }}', nome.capitalize()))
-
-        flash(f'Disciplina "{nome}" criada com sucesso!')
+        flash(f'Disciplina "{titulo}" criada com sucesso!', 'success')
         return redirect(url_for('main.dashboard'))
 
-    return render_template('admin/nova_disciplina.html')
+    return render_template('admin/nova_disciplina.html', form=form)
+
+
 
 @main.route('/disciplinas/<nome>/upload_flashcards', methods=['POST'])
 @login_required
@@ -91,6 +83,7 @@ def upload_flashcards(nome):
 def listar_disciplinas():
     disciplinas = Disciplina.query.order_by(Disciplina.ordem).all()
     return render_template('admin/listar_disciplinas.html', disciplinas=disciplinas)
+
 
 @main.route('/disciplinas/<int:id>/editar', methods=['GET', 'POST'])
 @login_required

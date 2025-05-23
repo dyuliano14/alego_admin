@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2>Disciplinas Disponíveis</h2>
-<ul>
+<div class="disciplinas-container">
   {% for nome in disciplinas %}
-    <li><a href="{{ url_for('main.editar_disciplina', nome=nome) }}">{{ nome }}</a></li>
+    <a href="{{ url_for('main.editar_disciplina', nome=nome) }}" class="btn btn-outline-primary">{{ nome }}</a>
   {% endfor %}
-</ul>
-<a href="{{ url_for('main.nova_disciplina') }}">➕ Nova Disciplina</a>
+</div>
+<a href="{{ url_for('main.nova_disciplina') }}" class="btn btn-success mt-3">➕ Nova Disciplina</a>
 {% endblock %}

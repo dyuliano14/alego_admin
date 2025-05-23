@@ -49,3 +49,7 @@ class ResetPasswordForm(FlaskForm):
         DataRequired(), EqualTo('password')
     ])
     submit = SubmitField('Redefinir senha')
+
+class NovaDisciplinaForm(FlaskForm):
+    nome_disciplina = StringField('Nome da Disciplina', validators=[DataRequired()])
+    submit = SubmitField('Criar')

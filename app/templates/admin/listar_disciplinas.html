@@ -1,15 +1,102 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<h2>📚 Disciplinas</h2>
-<ul>
-  {% for nome in disciplinas %}
-    <ul>
-  {% for d in disciplinas %}
-    <li>{{ d.titulo }}</li>  {# NÃO use d.nome se o campo é d.titulo! #}
-  {% endfor %}
-</ul>
+<div class="container mt-4">
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for msg in messages %}
+        <div class="alert alert-success">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 
+  <h2>📚 Disciplinas</h2>
+  <ul class="list-group mb-3">
+    {% for d in disciplinas %}
+  <li>
+    {{ d.titulo }}
+    <a href="{{ url_for('main.editar_disciplina', id=d.id) }}" class="btn btn-sm btn-primary">✏️ Editar</a>
 
-<a href="{{ url_for('main.nova_disciplina') }}">➕ Nova Disciplina</a>
+    <form action="{{ url_for('main.excluir_disciplina', id=d.id) }}" method="POST" style="display:inline;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn btn-sm btn-danger"
+              onclick="return confirm('Tem certeza que deseja excluir esta disciplina?')">🗑️</button>
+    </form>
+  </li>
+{% endfor %}
+  </ul>
+
+  <a href="{{ url_for('main.nova_disciplina') }}" class="btn btn-success">➕ Nova Disciplina</a>
+</div>
 {% endblock %}
+
+<!-- Modal de Edição -->
+<div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalEditarLabel">Editar Disciplina</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editar-id">
+        <div class="mb-3">
+          <label for="editar-titulo" class="form-label">Título</label>
+          <input type="text" class="form-control" id="editar-titulo">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" onclick="salvarEdicao()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function abrirModal(id, titulo) {
+    document.getElementById("editar-id").value = id;
+    document.getElementById("editar-titulo").value = titulo;
+    const modal = new bootstrap.Modal(document.getElementById('modalEditar'));
+    modal.show();
+  }
+
+  async function salvarEdicao() {
+    const id = document.getElementById("editar-id").value;
+    const titulo = document.getElementById("editar-titulo").value;
+
+    const response = await fetch(`/api/disciplinas/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('access_token')  // se usar JWT
+      },
+      body: JSON.stringify({ titulo: titulo })
+    });
+
+    if (response.ok) {
+      location.reload(); // ou atualize a linha específica dinamicamente
+    } else {
+      alert("Erro ao salvar");
+    }
+  }
+</script>
+<script>
+  async function excluirDisciplina(id) {
+    if (!confirm('Tem certeza?')) return false;
+
+    const response = await fetch(`/api/disciplinas/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+      }
+    });
+
+    if (response.ok) {
+      location.reload();
+    } else {
+      alert("Erro ao excluir");
+    }
+
+    return false;
+  }
+</script>

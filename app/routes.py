@@ -84,25 +84,32 @@ def listar_disciplinas():
     disciplinas = Disciplina.query.order_by(Disciplina.ordem).all()
     return render_template('admin/listar_disciplinas.html', disciplinas=disciplinas)
 
-
-@main.route('/disciplinas/<int:id>/editar', methods=['GET', 'POST'])
+@main.route('/editar_disciplina/<int:id>', methods=['GET', 'POST'])
 @login_required
 def editar_disciplina(id):
     disciplina = Disciplina.query.get_or_404(id)
-
-    if request.method == 'POST':
-        disciplina.titulo = request.form['titulo']
-        disciplina.categoria = request.form['categoria']
-        disciplina.tipo = request.form['tipo']
-        disciplina.ordem = request.form['ordem']
-        disciplina.descricao = request.form['descricao']
-        disciplina.link = request.form['link']
-
+    form = NovaDisciplinaForm(obj=disciplina)
+    
+    if form.validate_on_submit():
+        disciplina.titulo = form.nome_disciplina.data.strip()
         db.session.commit()
         flash('Disciplina atualizada com sucesso!', 'success')
         return redirect(url_for('main.listar_disciplinas'))
+    
+    form.nome_disciplina.data = disciplina.titulo
+    return render_template('admin/editar_disciplina.html', form=form, disciplina=disciplina)
 
-    return render_template('admin/editar_disciplina.html', disciplina=disciplina)
+
+@main.route('/excluir_disciplina/<int:id>', methods=['POST'])
+@login_required
+def excluir_disciplina(id):
+    d = Disciplina.query.get_or_404(id)
+    db.session.delete(d)
+    db.session.commit()
+    flash(f'Disciplina "{d.titulo}" excluída com sucesso!')
+    return redirect(url_for('main.listar_disciplinas'))
+
+
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():

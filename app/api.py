@@ -96,3 +96,22 @@ def deletar_disciplina(id):
     db.session.delete(d)
     db.session.commit()
     return jsonify({'message': 'Disciplina removida com sucesso!'})
+
+@api.route('/api/disciplinas/exportar', methods=['GET'])
+def exportar_disciplinas():
+    disciplinas = Disciplina.query.order_by(Disciplina.ordem).all()
+    exportadas = []
+
+    for d in disciplinas:
+        exportadas.append({
+            'id': d.id,
+            'titulo': d.titulo,
+            'categoria': d.categoria,
+            'tipo': d.tipo,
+            'ordem': d.ordem,
+            'descricao': d.descricao,
+            'link': d.link
+        })
+
+    return jsonify(exportadas), 200
+

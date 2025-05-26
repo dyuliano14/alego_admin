@@ -6,6 +6,7 @@ from flask_wtf import CSRFProtect
 from flask_mail import Mail
 from flask_jwt_extended import JWTManager
 from config import Config
+from flask_cors import CORS
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -17,10 +18,12 @@ jwt = JWTManager()
 
 
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     app.config['JWT_SECRET_KEY'] = 'dyu1412'
+    CORS(app)
 
     db.init_app(app)
     migrate.init_app(app, db)  # ✅ Inicializa o Migrate corretamente

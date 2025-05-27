@@ -35,7 +35,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\dyuliano.magalhães\Desktop\ROTEIROS FÉRIAS BRUNO\alego_admin-feature-admin\alego_admin-feature-admin\.venv"
+VIRTUAL_ENV="D:\PROGRAMAS\alego_admin\.venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

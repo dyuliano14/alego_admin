@@ -3,7 +3,15 @@
 {% block content %}
 <h2>Bem-vindo, {{ current_user.username }}</h2>
 <p>Você está logado!</p>
-<a href="{{ url_for('main.nova_disciplina') }}">➕ Nova Disciplina</a>
+  <div class="container">
+  <div class="row">
+    <div class="col-sm">
+    <a href="{{ url_for('main.nova_disciplina') }}" class="btn btn-secondary" class="btn btn-primary">➕ Nova Disciplina</a></li>  
+    </div>
+    <div class="col-sm">
+    <a href="/api/disciplinas/exportar/csv" class="btn btn-primary">Exportar Disciplinas (CSV)</a></li>
+    </div>
+</div>
 {% endblock %}
 {% with messages = get_flashed_messages() %}
   {% if messages %}

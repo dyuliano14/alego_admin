@@ -3,6 +3,9 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from werkzeug.security import check_password_hash
 from .models import Disciplina, User
 from . import db
+from flask import Response
+import csv
+from io import StringIO
 
 api = Blueprint('api', __name__)
 
@@ -46,18 +49,6 @@ def get_disciplinas():
         } for d in disciplinas
     ])
 
-@api.route('/api/disciplinas/<int:id>', methods=['GET'])
-def get_disciplina(id):
-    d = Disciplina.query.get_or_404(id)
-    return jsonify({
-        'id': d.id,
-        'titulo': d.titulo,
-        'categoria': d.categoria,
-        'tipo': d.tipo,
-        'ordem': d.ordem,
-        'descricao': d.descricao,
-        'link': d.link
-    })
 
 @api.route('/api/disciplinas', methods=['POST'])
 @jwt_required()
@@ -99,19 +90,42 @@ def deletar_disciplina(id):
 
 @api.route('/api/disciplinas/exportar', methods=['GET'])
 def exportar_disciplinas():
-    disciplinas = Disciplina.query.order_by(Disciplina.ordem).all()
-    exportadas = []
-
+    disciplinas = Disciplina.query.all()
+    data = []
     for d in disciplinas:
-        exportadas.append({
-            'id': d.id,
-            'titulo': d.titulo,
-            'categoria': d.categoria,
-            'tipo': d.tipo,
-            'ordem': d.ordem,
-            'descricao': d.descricao,
-            'link': d.link
+        data.append({
+            "id": d.id,
+            "nome": d.titulo,
+            "conteudo": {
+                "aulas": d.aulas,
+                "planejamento": d.planejamento,
+                "flashcards": d.flashcards,
+                "resumos": d.resumos,
+                "apresentacao": d.apresentacao
+            }
         })
+    return jsonify(data)
 
-    return jsonify(exportadas), 200
+@api.route('/api/disciplinas/exportar/csv', methods=['GET'])
+def exportar_disciplinas_csv():
+    disciplinas = Disciplina.query.order_by(Disciplina.ordem).all()
 
+    # Criar um buffer de string para armazenar o conteúdo CSV
+    si = StringIO()
+    writer = csv.writer(si)
+
+    # Escrever o cabeçalho
+    writer.writerow(['ID', 'Título', 'Categoria', 'Tipo', 'Ordem', 'Descrição', 'Link'])
+
+    # Escrever os dados das disciplinas
+    for d in disciplinas:
+        writer.writerow([d.id, d.titulo, d.categoria, d.tipo, d.ordem, d.descricao, d.link])
+
+    # Preparar a resposta com o conteúdo CSV
+    output = si.getvalue()
+    si.close()
+    return Response(
+        output,
+        mimetype='text/csv',
+        headers={'Content-Disposition': 'attachment;filename=disciplinas.csv'}
+    )

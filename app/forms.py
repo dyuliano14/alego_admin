@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, IntegerField, TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
 class DisciplinaForm(FlaskForm):
@@ -52,4 +52,16 @@ class ResetPasswordForm(FlaskForm):
 
 class NovaDisciplinaForm(FlaskForm):
     nome_disciplina = StringField('Nome da Disciplina', validators=[DataRequired()])
-    submit = SubmitField('Criar')
+    categoria = StringField('Categoria')
+    tipo = StringField('Tipo')
+    ordem = IntegerField('Ordem', default=0)
+    descricao = TextAreaField('Descrição')
+    link = StringField('Link')
+    
+    aulas = TextAreaField('Aulas (separadas por vírgula)')
+    planejamento = TextAreaField('Planejamento')
+    flashcards = TextAreaField('Flashcards (separados por vírgula)')
+    resumos = TextAreaField('Resumos')
+    apresentacao = TextAreaField('Apresentação')
+
+    submit = SubmitField('Salvar')

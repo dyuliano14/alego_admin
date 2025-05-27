@@ -43,16 +43,27 @@ def dashboard():
 @login_required
 def nova_disciplina():
     form = NovaDisciplinaForm()
+    
     if form.validate_on_submit():
-        titulo = form.nome_disciplina.data.strip().lower()
-
-        nova = Disciplina(titulo=titulo, categoria="", tipo="", ordem=0, descricao="", link="")
+        nova = Disciplina(
+            titulo=form.nome_disciplina.data,
+            categoria="",
+            tipo="",
+            ordem=0,
+            descricao="",
+            link="",
+            aulas="",
+            planejamento="",
+            flashcards="",
+            resumos="",
+            apresentacao=""
+        )
         db.session.add(nova)
         db.session.commit()
+        flash("Disciplina criada com sucesso!")
+        return redirect(url_for('main.listar_disciplinas'))
 
-        flash(f'Disciplina "{titulo}" criada com sucesso!', 'success')
-        return redirect(url_for('main.dashboard'))
-
+    # 🔥 Importante: precisa ter esse retorno para método GET
     return render_template('admin/nova_disciplina.html', form=form)
 
 
@@ -89,15 +100,22 @@ def listar_disciplinas():
 def editar_disciplina(id):
     disciplina = Disciplina.query.get_or_404(id)
     form = NovaDisciplinaForm(obj=disciplina)
-    
-    if form.validate_on_submit():
-        disciplina.titulo = form.nome_disciplina.data.strip()
-        db.session.commit()
-        flash('Disciplina atualizada com sucesso!', 'success')
-        return redirect(url_for('main.listar_disciplinas'))
-    
-    form.nome_disciplina.data = disciplina.titulo
-    return render_template('admin/editar_disciplina.html', form=form, disciplina=disciplina)
+    aulas = [a.strip() for a in form.aulas.data.split(',')] if form.aulas.data else []
+    flashcards = [f.strip() for f in form.flashcards.data.split(',')] if form.flashcards.data else []
+
+    disciplina = Disciplina(
+        titulo=form.nome_disciplina.data,
+        categoria=form.categoria.data,
+        tipo=form.tipo.data,
+        ordem=form.ordem.data,
+        descricao=form.descricao.data,
+        link=form.link.data,
+        aulas=aulas,
+        planejamento=form.planejamento.data,
+        flashcards=flashcards,
+        resumos=form.resumos.data,
+        apresentacao=form.apresentacao.data
+    )
 
 
 @main.route('/excluir_disciplina/<int:id>', methods=['POST'])
